@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fret</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+        }
+        .text-display {
+            font-size: 240px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .timer-bar {
+            width: 50%;
+            background-color: #ddd;
+            height: 20px;
+            position: relative;
+            margin-top: 20px;
+        }
+        .timer-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50;
+            text-align: right;
+        }
+        .countdown {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: -25px;
+            font-size: 16px;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<div id="display" class="text-display">A</div>
+<div class="timer-bar">
+    <div id="timer-fill" class="timer-bar-fill"></div>
+    <div id="countdown" class="countdown"></div>
+</div>
+
+<script>
+    let texts = ['A', 'Ab', 'B', 'Bb', 'C', 'C#', 'D', 'D#', 'Db', 'E', 'Eb', 'F', 'F#', 'G', 'G#', 'Gb'];
+    let currentIndex = 0;
+    let changeCount = 0;
+    let timer = null;
+    texts = shuffle(texts);
+
+    function shuffle(array) {
+        let currentIndex = array.length, randomIndex;
+
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+
+            [array[currentIndex], array[randomIndex]] = [
+                array[randomIndex], array[currentIndex]];
+        }
+
+        return array;
+    }
+
+    function resetColors() {
+        document.getElementById('timer-fill').style.backgroundColor = '#4CAF50';
+        document.getElementById('countdown').style.color = 'black';
+    }
+
+    function updateTextAndTimer() {
+        if (changeCount >= 18) return;
+
+        document.getElementById('display').textContent = texts[currentIndex];
+        currentIndex = (currentIndex + 1) % texts.length;
+        changeCount++;
+
+        resetColors();
+        let width = 0;
+        const intervalTime = 100;
+        let totalTime = 10000; // 10초로 변경
+        let remainingTime = totalTime / 1000;
+        document.getElementById('countdown').textContent = `${remainingTime}s`;
+        timer = setInterval(() => {
+            width += intervalTime / totalTime * 100;
+            remainingTime -= intervalTime / 1000;
+            document.getElementById('timer-fill').style.width = `${width}%`;
+            document.getElementById('countdown').textContent = `${Math.ceil(remainingTime)}s`;
+            if (remainingTime <= 3) { 
+                document.getElementById('timer-fill').style.backgroundColor = 'red';
+                document.getElementById('countdown').style.color = 'red';
+            }
+            if (width >= 100) {
+                clearInterval(timer);
+                updateTextAndTimer();            }
+        }, intervalTime);
+    }
+
+    updateTextAndTimer();
+</script>
+
+</body>
+</html>
